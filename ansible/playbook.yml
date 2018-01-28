@@ -5,16 +5,13 @@
   vars:
     node_id: node_id
     ip: ip
-    index: index
     brokers: brokers
-    zookeepers: brokers.split(',')
     zookeeper_port_range: ":2888:3888"
     zookeeper_port: "2181"
     kafka_port: "2181"
 
   remote_user: root
   tasks:
-
   - name: Add openjdk repository
     apt_repository:
       repo: 'ppa:openjdk-r/ppa'
@@ -104,16 +101,14 @@
     supervisorctl:
       name: zookeeper
       state: restarted
-    become: yes
 
   - name: Start Kafka
     supervisorctl:
       name: kafka
       state: restarted
-    become: yes
 
   - name: Start ksql
     supervisorctl:
       name: kafka
       state: restarted
-    become: yes
+      
