@@ -41,21 +41,17 @@ Vagrant.configure("2") do |config|
     brokers.push(info['ip'])
   end
   nodes.each_with_index do |(name, info), index|
-    puts "Node#{info['node_id']}"
 
-    # config.vm.define "node#{index}" do |node|
     config.vm.define "node#{info['node_id']}" do |node|
       node.vm.hostname=name
       node.vm.network "private_network", ip: info['ip']
-      # node.vm.provision :shell, path: "bootstrap.sh", :args => "#{id} #{info['ip']} #{brokersStr} "
 
       node.vm.provision :ansible do |ansible|
-
-        # Disable default limit to connect to all the machines
         ansible.limit = "all"
         ansible.playbook = "ansible/playbook.yml"
         ansible.extra_vars = {
           index: index,
+          node_name: name,
           node_id: info['node_id'],
           ip: info['ip'],
           brokers: brokers
