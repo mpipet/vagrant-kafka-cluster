@@ -1,0 +1,94 @@
+---
+- hosts: all
+  become: yes
+  # gather_facts: no
+  # pre_tasks:
+  #   - name: 'install python2'
+  #     raw: sudo apt-get -y install python-simplejson
+
+  vars:
+    node_id: node_id
+    ip: ip
+    index: index
+    brokers: brokers
+    zookeepers: brokers.split(',')
+    zookeeper_port_range: ":2888:3888"
+    zookeeper_port: "2181"
+
+  remote_user: root
+  tasks:
+
+  - name: Add openjdk repository
+    apt_repository:
+      repo: 'ppa:openjdk-r/ppa'
+      codename: 'trusty'
+
+  - name: Install openjdk 8
+    apt:
+      name: openjdk-8-jdk
+      update_cache: yes
+      state: present
+
+  - name: Install Supervisor
+    apt:
+      name: supervisor
+      state: present
+
+  - name: Create Kafka dir
+    file:
+      path: /opt/kafka
+      state: directory  
+
+  - name: Install Kafka
+    unarchive:
+      src: http://apache.mirrors.ovh.net/ftp.apache.org/dist/kafka/1.0.0/kafka_2.12-1.0.0.tgz
+      dest: /opt/kafka
+      extra_opts: [--strip-components=1]
+      remote_src: yes
+
+  - name: Create Kafka data dir
+    file:
+      path: /data/kafka
+      state: directory   
+
+  - name: Create Zookeeper data dir
+    file:
+      path: /data/zookeeper
+      state: directory
+
+  - name: Create Zookeeper config file
+    template: 
+      src: zookeeper.properties.j2
+      dest: /opt/kafka/config/zookeeper.properties
+
+  - name: Create Kafka config file
+    template: 
+      src: server.properties.j2
+      dest: /opt/kafka/config/server.properties      
+
+  - name: Create node id file
+    copy: 
+      content: "{{ node_id }}" 
+      dest: /data/zookeeper/myid
+
+  - name: Create Supervisor Kafka conf
+    copy: 
+      src: supervisor_kafka.conf
+      dest: /etc/supervisor/conf.d/kafka.conf    
+
+  - name: Create Supervisor Zookeeper conf
+    copy: 
+      src: supervisor_zookeeper.conf
+      dest: /etc/supervisor/conf.d/zookeeper.conf          
+
+  - name: Start Zookeeper
+    supervisorctl:
+      name: zookeeper
+      state: restarted
+    become: yes
+
+  - name: Start Kafka
+    supervisorctl:
+      name: kafka
+      state: restarted
+    become: yes

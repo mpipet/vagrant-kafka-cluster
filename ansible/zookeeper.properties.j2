@@ -1,0 +1,9 @@
+dataDir=/data/zookeeper
+clientPort=2181
+maxClientCnxns=0
+
+{% for zookeeper_node in brokers %}
+server.{{index}}={{zookeeper_node}}{{zookeeper_port_range}}
+{% endfor %}
+initLimit=200
+syncLimit=200
