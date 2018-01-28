@@ -1,11 +1,6 @@
 ---
 - hosts: all
   become: yes
-  # gather_facts: no
-  # pre_tasks:
-  #   - name: 'install python2'
-  #     raw: sudo apt-get -y install python-simplejson
-
   vars:
     node_id: node_id
     ip: ip
@@ -14,6 +9,7 @@
     zookeepers: brokers.split(',')
     zookeeper_port_range: ":2888:3888"
     zookeeper_port: "2181"
+    kafka_port: "2181"
 
   remote_user: root
   tasks:
@@ -32,7 +28,7 @@
   - name: Install Supervisor
     apt:
       name: supervisor
-      state: present
+      state: present    
 
   - name: Create Kafka dir
     file:
@@ -71,6 +67,23 @@
       content: "{{ node_id }}" 
       dest: /data/zookeeper/myid
 
+  - name: Create ksql dir
+    file:
+      path: /opt/ksql
+      state: directory  
+
+  - name: Install ksql
+    unarchive:
+      src: https://s3-us-west-2.amazonaws.com/ksql-releases/releases/0.3/ksql.tgz
+      dest: /opt/ksql
+      extra_opts: [--strip-components=1]
+      remote_src: yes 
+
+  - name: Create ksql config file
+    template: 
+      src: server.properties.j2
+      dest: /opt/kafka/config/server.properties   
+
   - name: Create Supervisor Kafka conf
     copy: 
       src: supervisor_kafka.conf
@@ -79,7 +92,12 @@
   - name: Create Supervisor Zookeeper conf
     copy: 
       src: supervisor_zookeeper.conf
-      dest: /etc/supervisor/conf.d/zookeeper.conf          
+      dest: /etc/supervisor/conf.d/zookeeper.conf
+
+  - name: Create Supervisor ksql conf
+    copy: 
+      src: supervisor_ksql.conf
+      dest: /etc/supervisor/conf.d/ksql.conf                   
 
   - name: Start Zookeeper
     supervisorctl:
@@ -88,6 +106,12 @@
     become: yes
 
   - name: Start Kafka
+    supervisorctl:
+      name: kafka
+      state: restarted
+    become: yes
+
+  - name: Start ksql
     supervisorctl:
       name: kafka
       state: restarted
