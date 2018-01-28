@@ -22,18 +22,18 @@ Vagrant.configure("2") do |config|
       'kafka_host_port' => 8180
 
     },
-#     'node2' => { 
-#       'node_id' => 2,
-#       'ip' => "192.168.33.34",
-#       'zoo_host_port' => 8081,
-#       'kafka_host_port' => 8181
-#     },
-#     'node3' => { 
-#       'node_id' => 3,
-#       'ip' => "192.168.33.35",
-#       'zoo_host_port' => 8082,
-#       'kafka_host_port' => 8182
-#     }
+    'node2' => { 
+      'node_id' => 2,
+      'ip' => "192.168.33.34",
+      'zoo_host_port' => 8081,
+      'kafka_host_port' => 8181
+    },
+    'node3' => { 
+      'node_id' => 3,
+      'ip' => "192.168.33.35",
+      'zoo_host_port' => 8082,
+      'kafka_host_port' => 8182
+    }
   }
 
   brokers = Array.new 
