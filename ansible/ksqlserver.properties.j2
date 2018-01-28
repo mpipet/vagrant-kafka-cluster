@@ -1,4 +1,4 @@
-bootstrap.servers={{brokers|join(':'+ kafka_port +',')}}
+bootstrap.servers={brokers|map('regex_replace', '^(.*)$', '\\1:' + kafka_port)|join(',')}}
 ksql.command.topic.suffix=commands
 
 listeners=http://0.0.0.0:8080
