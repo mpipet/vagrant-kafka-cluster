@@ -1,9 +1,9 @@
-vagrant-kafka-cluster
+vagrant-ksql
 =============
-### A kafka cluster vagrant for dev usage
+### A vagrant provided kafka cluster with ksql servers for tests usage
 
 This vagrant boot a three node kafka cluster, available on port 9092 outside the vagrant.
-
+The new ksql feature from Confluent (currently in beta) is also installed on each nodes.
 
 Installation
 ------------
@@ -14,15 +14,22 @@ vagrant up
 
 ```
 
+You can set any node you want from the Vagrantfile.
+
 ksql
 ------------
-The new ksql feature from Confluent (currently in beta) is also installed
 
-ksql server is already started and can be also accessed from anywhere outside the vagrant with:
+ksql servers are already started and can be accessed from anywhere outside the vagrant at the folling locations:
+``` bash
+http://192.168.33.33
+http://192.168.33.34
+http://192.168.33.35
+```
+
+
+If you are using the Confluent ksql-cli (the only one available for now)
 
 ``` bash
 # from vagrant ksql folder 
 /opt/ksql/bin/ksql-cli remote http://192.168.33.33:8080
 ```
-You can also acess the ksql server on the two oser nodes:
-http://192.168.33.34 and http://192.168.33.35
