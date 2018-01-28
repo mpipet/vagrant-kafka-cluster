@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- hosts: 
+    "{{node_name}}"
   become: yes
   vars:
     node_id: node_id
@@ -81,8 +82,8 @@
 
   - name: Create ksql config file
     template: 
-      src: server.properties.j2
-      dest: /opt/kafka/config/server.properties   
+      src: ksqlserver.properties.j2
+      dest: /opt/ksql/config/ksqlserver.properties   
 
   - name: Create Supervisor Kafka conf
     copy: 
